@@ -8,6 +8,11 @@ It can be used with any TCP client like `netcat`,
 - Connecting via netcat: `netcat ip_address port`
 - The server will prompt you for a username which will be displayed to other clients.
 
+## Features
+- Usernames visible to other clients
+- Clients do not get their own messages sent back to them
+
+
 ## Known issues
 - After any client disconnects, other's screens are filled with empty messages.
 
