@@ -12,11 +12,10 @@ It can be used with any TCP client like `netcat`,
 - Usernames visible to other clients
 - Clients do not get their own messages sent back to them
 
-
 ## Known issues
 - After any client disconnects, other's screens are filled with empty messages.
 
 ## TODO
-- [] Add a prompt string to the clients
+- [ ] Add a prompt string to the clients
 - [] More logging serverside
 - [] Chat commands like /disconnect
