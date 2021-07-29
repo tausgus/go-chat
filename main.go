@@ -10,35 +10,37 @@ import (
 
 
 var users = make(map[net.Addr]string)
-var conns []net.Conn
+var activeConnections []net.Conn
+
 
 func main() {
 	if len(os.Args) != 2 {
 		fmt.Println("Usage: " + os.Args[0] + " <port>")
 		os.Exit(1)
 	}
+
 	listener, _ := net.Listen("tcp", ":" + os.Args[1])
 	for {
 		conn, _ := listener.Accept()
-		fmt.Println("Proceeding to handle a connection..")
-
-		go handleConn(conn)
+		fmt.Println("Accepting incoming connection from " + conn.RemoteAddr().String())
+		go handleClient(conn)
 	}
 }
 
-func handleConn(workConn net.Conn) {
-	defer workConn.Close()
-	conns = append(conns, workConn)
-	workConn.Write([]byte("Enter your name: "))
-        message, _ := bufio.NewReader(workConn).ReadString('\n')
-        users[workConn.RemoteAddr()] = string(message)
-	workConn.Write([]byte("Welcome, " + users[workConn.RemoteAddr()]))
+
+func handleClient(client net.Conn) {
+	activeConnections = append(activeConnections, client) 
+
+	client.Write([]byte("Enter a username > "))
+        message, _ := bufio.NewReader(client).ReadString('\n')
+        users[client.RemoteAddr()] = string(message)
 
 	for {
-		message, _ := bufio.NewReader(workConn).ReadString('\n')
-		for i := 0; i < len(conns); i++ {
-			if conns[i] != workConn {
-				conns[i].Write([]byte("[" + strings.TrimSuffix(users[workConn.RemoteAddr()], "\n") + "]: " + message))
+		message, _ := bufio.NewReader(client).ReadString('\n')
+
+		for i := 0; i < len(activeConnections); i++ {
+			if activeConnections[i] != client {
+				activeConnections[i].Write([]byte("[" + strings.TrimSuffix(users[client.RemoteAddr()], "\n") + "]: " + message))
 			}
 		}
 	}
