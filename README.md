@@ -17,5 +17,5 @@ It can be used with any TCP client like `netcat`,
 
 ## TODO
 - [ ] Add a prompt string to the clients
-- [] More logging serverside
-- [] Chat commands like /disconnect
+- [ ] More logging serverside
+- [ ] Chat commands like /disconnect
