@@ -11,6 +11,7 @@ It can be used with any TCP client like `netcat`,
 ## Features
 - Usernames visible to other clients
 - Clients do not get their own messages sent back to them
+- Very simple and minimalistic, the built binary is around ~1KB in size
 
 ## Known issues
 - After any client disconnects, other's screens are filled with empty messages.
