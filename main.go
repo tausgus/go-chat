@@ -31,14 +31,14 @@ func handleClient(client net.Conn) {
 
 	client.Write([]byte("Enter a username > "))
 	message, _ := bufio.NewReader(client).ReadString('\n') // Promt the new client for an username and map it to their IP address
-	users[client.RemoteAddr()] = string(message)
+	users[client.RemoteAddr()] = sanitise(string(message))
 	client.Write([]byte("Welcome, " + strings.TrimSuffix(users[client.RemoteAddr()], "\n") + ".\n"))
 
 	activeConnections = append(activeConnections, client) // Append new connection to the list of active ones, to be used for broadcasting messages
 
-	for i := 0; i < len(activeConnections); i++ {
-		if activeConnections[i] != client { // Broadcast any new messages to all clients except the sender
-			activeConnections[i].Write([]byte("[SERVER] " + strings.TrimSuffix(users[client.RemoteAddr()], "\n") + " joined the room.\n"))
+	for _, connection := range activeConnections {
+		if connection != client { // Broadcast any new messages to all clients except the sender
+			connection.Write([]byte("[SERVER] " + strings.TrimSuffix(users[client.RemoteAddr()], "\n") + " joined the room.\n"))
 		}
 	}
 
@@ -46,17 +46,26 @@ func handleClient(client net.Conn) {
 		message, _ := bufio.NewReader(client).ReadString('\n')
 
 		if message == "" { // Empty messages (no newlines) are sent by disconnected clients, this code will catch them and end the subroutine
-			for i := 0; i < len(activeConnections); i++ {
+			for _, connection := range activeConnections {
 				isConnected = false
 				client.Close()
-				activeConnections[i].Write([]byte("[SERVER] " + strings.TrimSuffix(users[client.RemoteAddr()], "\n") + " left the room.\n"))
+				connection.Write([]byte("[SERVER] " + strings.TrimSuffix(users[client.RemoteAddr()], "\n") + " left the room.\n"))
 			}
 		} else {
-			for i := 0; i < len(activeConnections); i++ {
-				if activeConnections[i] != client { // Broadcast any new messages to all clients except the sender
-					activeConnections[i].Write([]byte("[" + strings.TrimSuffix(users[client.RemoteAddr()], "\n") + "]: " + message))
+			for _, connection := range activeConnections {
+				if connection != client { // Broadcast any new messages to all clients except the sender
+					connection.Write([]byte("[" + strings.TrimSuffix(users[client.RemoteAddr()], "\n") + "]: " + sanitise(message)))
 				}
 			}
 		}
 	}
+}
+
+func sanitise(s string) string {
+	sanitised := ""
+	blacklist := []string{"^[", "\033", "\u001b", "\x1b"}
+	for _, value := range blacklist {
+		sanitised = strings.ReplaceAll(s, value, "")
+	}
+	return sanitised
 }
