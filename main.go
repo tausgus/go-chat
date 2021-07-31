@@ -36,11 +36,7 @@ func handleClient(client net.Conn) {
 
 	activeConnections = append(activeConnections, client) // Append new connection to the list of active ones, to be used for broadcasting messages
 
-	for _, connection := range activeConnections {
-		if connection != client { // Broadcast any new messages to all clients except the sender
-			connection.Write([]byte("[SERVER] " + strings.TrimSuffix(users[client.RemoteAddr()], "\n") + " joined the room.\n"))
-		}
-	}
+	broadcast(client, "[SERVER] "+strings.TrimSuffix(users[client.RemoteAddr()], "\n")+" joined the room.\n")
 
 	for isConnected {
 		message, _ := bufio.NewReader(client).ReadString('\n')
@@ -52,11 +48,7 @@ func handleClient(client net.Conn) {
 				connection.Write([]byte("[SERVER] " + strings.TrimSuffix(users[client.RemoteAddr()], "\n") + " left the room.\n"))
 			}
 		} else {
-			for _, connection := range activeConnections {
-				if connection != client { // Broadcast any new messages to all clients except the sender
-					connection.Write([]byte("[" + strings.TrimSuffix(users[client.RemoteAddr()], "\n") + "]: " + sanitise(message)))
-				}
-			}
+			broadcast(client, "["+strings.TrimSuffix(users[client.RemoteAddr()], "\n")+"]: "+message) // If the message was not empty, broadcast it
 		}
 	}
 }
@@ -68,4 +60,12 @@ func sanitise(s string) string {
 		sanitised = strings.ReplaceAll(s, value, "")
 	}
 	return sanitised
+}
+
+func broadcast(sender net.Conn, message string) {
+	for _, connection := range activeConnections {
+		if connection != sender { // Broadcast any new messages to all clients/connections except the sender
+			connection.Write([]byte(sanitise(message)))
+		}
+	}
 }
