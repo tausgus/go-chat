@@ -7,6 +7,8 @@ It can be used with any TCP client like `netcat`,
 - Simply run `/path/to/go-chat portnum`, where `portnum` is the port that should be used for communications.
 - Connecting via netcat: `netcat ip_address port`
 - The server will prompt you for a username which will be displayed to other clients.
+Using `rlwrap` will prevent messages others send from overlapping what you are currently writing:
+`rlwrap netcat ip_address port`
 
 ## Features
 - Usernames visible to other clients
