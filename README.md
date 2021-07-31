@@ -13,4 +13,6 @@ Using `rlwrap` will prevent messages others send from overlapping what you are c
 ## Features
 - Usernames visible to other clients
 - Clients do not get their own messages sent back to them
-- Very simple and minimalistic, the built binary is under 5 MB.
+- Join/leave messages
+- Input sanitation
+- Very simple and minimalistic, the built binary is under 5 MB
